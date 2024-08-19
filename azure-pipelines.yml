@@ -1,7 +1,5 @@
 trigger:
-  branches:
-    include:
-      - development
+- development
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -18,16 +16,18 @@ stages:
     - job: BuildJob
       displayName: 'Build Job'
       steps:
-      - task: UsePhpVersion@0
-        inputs:
-          version: '7.4'  # Adjust according to your PHP version
-
       - script: |
+          sudo apt-get update
+          sudo apt-get install -y php php-cli php-xml php-mbstring
           php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
           php composer-setup.php
           php -r "unlink('composer-setup.php');"
           php composer.phar install
-        displayName: 'Install Composer dependencies'
+        displayName: 'Install PHP and Composer dependencies'
+
+      - script: |
+          echo Build steps go here
+        displayName: 'Custom Build Steps'
 
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Build Artifacts'
