@@ -1,19 +1,60 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- development
+  branches:
+    include:
+      - development
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  buildConfiguration: 'Release'
+  buildPlatform: 'Any CPU'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  # CI Stage
+  - stage: Build
+    displayName: 'Build Stage'
+    jobs:
+    - job: BuildJob
+      displayName: 'Build Job'
+      steps:
+      - task: UsePhpVersion@0
+        inputs:
+          version: '7.4'  # Adjust according to your PHP version
+
+      - script: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php
+          php -r "unlink('composer-setup.php');"
+          php composer.phar install
+        displayName: 'Install Composer dependencies'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Build Artifacts'
+        inputs:
+          pathToPublish: '$(System.DefaultWorkingDirectory)'
+          artifactName: 'drop'
+          publishLocation: 'Container'
+
+  # CD Stage
+  - stage: Deploy
+    displayName: 'Deploy Stage'
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
+    jobs:
+    - deployment: DeployToAppService
+      displayName: 'Deploy to Azure App Service'
+      environment: 'Production'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - download: current
+              artifact: drop
+            - task: AzureWebApp@1
+              inputs:
+                azureSubscription: 'Azure for Students'
+                appType: 'webAppLinux'
+                appName: '<Your-App-Service-Name>'
+                resourceGroupName: 'Group-6-Project-webapp'
+                package: '$(System.ArtifactsDirectory)/drop'
