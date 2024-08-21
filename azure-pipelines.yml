@@ -37,24 +37,24 @@ stages:
           publishLocation: 'Container'
 
   # CD Stage
-  - stage: Deploy
-    displayName: 'Deploy Stage'
-    dependsOn: Build
-    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
-    jobs:
-    - deployment: DeployToAppService
-      displayName: 'Deploy to Azure App Service'
-      environment: 'Production'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - download: current
-              artifact: drop
-            - task: AzureWebApp@1
-              inputs:
-                azureSubscription: 'Azure for Students'
-                appType: 'webAppLinux'
-                appName: '<Your-App-Service-Name>'
-                resourceGroupName: 'Group-6-Project-webapp'
-                package: '$(System.ArtifactsDirectory)/drop'
+  #- stage: Deploy
+ #   displayName: 'Deploy Stage'
+ #   dependsOn: Build
+  #  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
+   # jobs:
+   # - deployment: DeployToAppService
+    #  displayName: 'Deploy to Azure App Service'
+    #  environment: 'Production'
+     # strategy:
+      #  runOnce:
+       #   deploy:
+        #    steps:
+         #   - download: current
+          #    artifact: drop
+           # - task: AzureWebApp@1
+            #  inputs:
+             #   azureSubscription: 'Azure for Students'
+              #  appType: 'webAppLinux'
+               # appName: '<Your-App-Service-Name>'
+               # resourceGroupName: 'Group-6-Project-webapp'
+               # package: '$(System.ArtifactsDirectory)/drop'
