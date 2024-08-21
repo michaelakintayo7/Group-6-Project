@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
+  azureSubscription: '499077f7-8663-4aad-aa01-0b5a53569a92'
   kubernetesServiceConnection: 'kubernetes-service-connection'
   dockerRegistryServiceConnection: 'docker-registry' # Docker Hub service connection name
   imageName: 'michaelakintayo7/docker-hub-repo'
