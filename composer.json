@@ -1,0 +1,25 @@
+{
+    "name": "Flinders-DevOps-Group-6",
+    "description": "Group-6 project for managing chemicals.",
+    "type": "project",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "vlucas/phpdotenv": "^5.5",
+        "monolog/monolog": "^2.3",
+        "slim/slim": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChemManager\\": "src/"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8000 -t public"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
