@@ -1,27 +1,35 @@
-# Use an official PHP runtime as a parent image
 FROM php:8.1-apache
 
-# Set the working directory in the container
+# Install system dependencies and tools required for building PHP extensions
+RUN apt-get update && apt-get install -y \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    libcurl4-openssl-dev \
+    libicu-dev \
+    g++ \
+    libtool \
+    autoconf \
+    automake \
+    make \
+    && docker-php-ext-install mysqli pdo pdo_mysql gd curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Optional: If you have a custom php.ini configuration, copy it here
+# COPY php.ini /usr/local/etc/php/
+
+# Ensure proper permissions for Apache
+RUN chown -R www-data:www-data /var/www/html
+
+# Set the working directory
 WORKDIR /var/www/html
 
-# Copy the current directory contents into the container at /var/www/html
-COPY . /var/www/html
-
-# Install necessary PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql gd curl
-
-# Enable Apache mod_rewrite for URL rewriting
-RUN a2enmod rewrite
-
-# Optional: Copy custom configuration files
-# COPY php.ini /usr/local/etc/php/
-# COPY .htaccess /var/www/html/
-
-# Set file ownership and permissions (optional)
-RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+# Copy application files (if any)
+# COPY . /var/www/html/
 
 # Expose port 80
 EXPOSE 80
 
-# Start the Apache server
+# Start Apache in the foreground
 CMD ["apache2-foreground"]
