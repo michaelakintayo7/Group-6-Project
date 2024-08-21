@@ -69,9 +69,9 @@ stages:
     - task: HelmDeploy@0
       inputs:
         connectionType: 'Azure Resource Manager'
-        azureSubscription: '$(azureSubscription)'
-        azureResourceGroup: '$(resourceGroup)'
-        kubernetesCluster: '$(aksCluster)'
+        azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
+        azureResourceGroup: 'Group-6-Project-webapp'
+        kubernetesCluster: 'group6cluster'
         command: 'upgrade'
         chartType: 'FilePath'
         chartPath: './helm-chart'
