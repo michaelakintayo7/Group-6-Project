@@ -7,7 +7,7 @@ pool:
 variables:
   dockerRegistryServiceConnection: 'docker-registry' # Docker Hub service connection name
   imageName: 'michaelakintayo7/docker-hub-repo'
-  dockerfilePath: 'Dockerfile'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'  # Ensure correct path to Dockerfile
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
   resourceGroup: 'Group-6-Project-webapp'
@@ -55,3 +55,25 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy Job'
+    steps:
+    - task: HelmInstaller@1
+      inputs:
+        helmVersionToInstall: 'latest'
+
+    - task: HelmDeploy@0
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscription: '$(azureSubscription)'
+        azureResourceGroup: '$(resourceGroup)'
+        kubernetesCluster: '$(aksCluster)'
+        command: 'upgrade'
+        chartType: 'FilePath'
+        chartPath: './helm-chart'
+        releaseName: 'myapp'
+        overrideValues: 'image.repository=$(imageName),image.tag=latest'
