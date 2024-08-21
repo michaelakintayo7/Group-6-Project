@@ -5,12 +5,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
+  kubernetesCluster: 'kubernetes-service-connection'
   dockerRegistryServiceConnection: 'docker-registry' # Docker Hub service connection name
   imageName: 'michaelakintayo7/docker-hub-repo'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'  # Ensure correct path to Dockerfile
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
-  resourceGroup: 'Group-6-Project-webapp'
+  azureResourceGroup: 'Group-6-Project-webapp'
   aksCluster: 'group6cluster'
 
 stages:
@@ -69,9 +71,9 @@ stages:
     - task: HelmDeploy@0
       inputs:
         connectionType: 'Azure Resource Manager'
-        azureSubscription: 'kubernetes-service-connection'
-        azureResourceGroup: 'Group-6-Project-webapp'
-        kubernetesCluster: 'group6cluster'
+        azureSubscriptionEndpoint: '$(azureSubscription)'  # Reference to your variable
+        azureResourceGroup: '$(resourceGroup)'
+        kubernetesCluster: '$(aksCluster)'
         command: 'upgrade'
         chartType: 'FilePath'
         chartPath: './helm-chart'
