@@ -68,8 +68,8 @@ stages:
 
     - task: HelmDeploy@0
       inputs:
-        connectionType: 'kubernetes-service-connection'
-        azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
+        connectionType: 'Azure Resource Manager'
+        azureSubscription: 'kubernetes-service-connection'
         azureResourceGroup: 'Group-6-Project-webapp'
         kubernetesCluster: 'group6cluster'
         command: 'upgrade'
