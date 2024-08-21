@@ -55,16 +55,3 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: Deploy
-  displayName: 'Deploy Stage'
-  dependsOn: Build
-  jobs:
-  - job: DeployJob
-    displayName: 'Deploy Job'
-    steps:
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
-        scriptType: 'bash'
-        scriptPath: '$(System.DefaultWorkingDirectory)/scripts/deploy-to-aks.sh'
-        arguments: '--resource-group $(resourceGroup) --aks-cluster $(aksCluster) --image $(imageName):latest'
