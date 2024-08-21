@@ -20,11 +20,34 @@ stages:
         php -r "unlink('composer-setup.php');"
         php composer.phar install
       displayName: 'Install PHP and Composer dependencies'
+      
+    # Ensure that build artifacts are properly archived
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
 
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: 'michaelakintayo7' # Replace with your updated service connection name
-    appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
-    appName: 'chemicalordering' # Your App Service name
-    package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    deploymentMethod: 'runFromPackage'
+    # Publish artifacts to be used in the release stage
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy Job'
+    steps:
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'michaelakintayo7' # Replace with your updated service connection name
+        appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
+        appName: 'chemicalordering' # Your App Service name
+        package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        deploymentMethod: 'runFromPackage'
