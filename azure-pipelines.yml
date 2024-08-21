@@ -20,3 +20,11 @@ stages:
         php -r "unlink('composer-setup.php');"
         php composer.phar install
       displayName: 'Install PHP and Composer dependencies'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'michaelakintayo7' # Replace with your updated service connection name
+    appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
+    appName: 'chemicalordering' # Your App Service name
+    package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    deploymentMethod: 'runFromPackage'
