@@ -1,9 +1,17 @@
+trigger:
+- development  # Or your default branch
+
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  dockerRegistryServiceConnection: 'docker-registry' # Docker Hub service connection name
+  imageName: 'michaelakintayo7/docker-hub-repo'
+  dockerfilePath: 'Dockerfile'
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
+  resourceGroup: 'Group-6-Project-webapp'
+  aksCluster: 'group6cluster'
 
 stages:
 - stage: Build
@@ -20,8 +28,19 @@ stages:
         php -r "unlink('composer-setup.php');"
         php composer.phar install
       displayName: 'Install PHP and Composer dependencies'
-      
-    # Ensure that build artifacts are properly archived
+
+    # Docker build and push
+    - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+        containerRegistry: '$(dockerRegistryServiceConnection)'
+        repository: '$(imageName)'
+        dockerfile: '$(dockerfilePath)'
+        tags: |
+          latest
+        buildContext: '$(Build.SourcesDirectory)'
+
+    # Archive build artifacts if necessary
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)'
@@ -30,7 +49,6 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
-    # Publish artifacts to be used in the release stage
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -44,10 +62,9 @@ stages:
   - job: DeployJob
     displayName: 'Deploy Job'
     steps:
-    - task: AzureWebApp@1
+    - task: AzureCLI@2
       inputs:
-        azureSubscription: 'michaelakintayo7' # Replace with your updated service connection name
-        appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
-        appName: 'chemicalordering' # Your App Service name
-        package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-        deploymentMethod: 'runFromPackage'
+        azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
+        scriptType: 'bash'
+        scriptPath: '$(System.DefaultWorkingDirectory)/scripts/deploy-to-aks.sh'
+        arguments: '--resource-group $(resourceGroup) --aks-cluster $(aksCluster) --image $(imageName):latest'
