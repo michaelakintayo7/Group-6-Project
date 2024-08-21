@@ -6,7 +6,7 @@ pool:
 
 variables:
   azureSubscription: '5bb2315d-6a24-4f44-9f69-50511bf6e54d'
-  kubernetesCluster: 'kubernetes-service-connection'
+  kubernetesServiceConnection: 'kubernetes-service-connection'
   dockerRegistryServiceConnection: 'docker-registry' # Docker Hub service connection name
   imageName: 'michaelakintayo7/docker-hub-repo'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'  # Ensure correct path to Dockerfile
@@ -72,8 +72,8 @@ stages:
       inputs:
         connectionType: 'Azure Resource Manager'
         azureSubscriptionEndpoint: '$(azureSubscription)'  # Reference to your variable
-        azureResourceGroup: '$(resourceGroup)'
-        kubernetesCluster: '$(aksCluster)'
+        azureResourceGroup: '$(azureResourceGroup)'  # Updated to match the variable
+        kubernetesCluster: '$(kubernetesServiceConnection)'  # Reference to your variable
         command: 'upgrade'
         chartType: 'FilePath'
         chartPath: './helm-chart'
