@@ -1,19 +1,9 @@
-trigger:
-- development  # Or your default branch
-
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: '499077f7-8663-4aad-aa01-0b5a53569a92'
-  kubernetesServiceConnection: 'kubernetes-service-connection'
-  dockerRegistryServiceConnection: 'docker-registry' # Docker Hub service connection name
-  imageName: 'michaelakintayo7/docker-hub-repo'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'  # Ensure correct path to Dockerfile
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
-  azureResourceGroup: 'Group-6-Project-webapp'
-  aksCluster: 'group6cluster'
 
 stages:
 - stage: Build
@@ -30,19 +20,8 @@ stages:
         php -r "unlink('composer-setup.php');"
         php composer.phar install
       displayName: 'Install PHP and Composer dependencies'
-
-    # Docker build and push
-    - task: Docker@2
-      inputs:
-        command: 'buildAndPush'
-        containerRegistry: '$(dockerRegistryServiceConnection)'
-        repository: '$(imageName)'
-        dockerfile: '$(dockerfilePath)'
-        tags: |
-          latest
-        buildContext: '$(Build.SourcesDirectory)'
-
-    # Archive build artifacts if necessary
+      
+    # Ensure that build artifacts are properly archived
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)'
@@ -51,6 +30,7 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
+    # Publish artifacts to be used in the release stage
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -64,18 +44,10 @@ stages:
   - job: DeployJob
     displayName: 'Deploy Job'
     steps:
-    - task: HelmInstaller@1
+    - task: AzureWebApp@1
       inputs:
-        helmVersionToInstall: 'latest'
-
-    - task: HelmDeploy@0
-      inputs:
-        connectionType: 'Azure Resource Manager'
-        azureSubscriptionEndpoint: '$(azureSubscription)'  # Reference to your variable
-        azureResourceGroup: '$(azureResourceGroup)'  # Updated to match the variable
-        kubernetesCluster: '$(kubernetesServiceConnection)'  # Reference to your variable
-        command: 'upgrade'
-        chartType: 'FilePath'
-        chartPath: './helm-chart'
-        releaseName: 'myapp'
-        overrideValues: 'image.repository=$(imageName),image.tag=latest'
+        azureSubscription: 'azure-sub' # Replace with your updated service connection name
+        appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
+        appName: 'group-six-webapp-services' # Your App Service name
+        package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        deploymentMethod: 'runFromPackage'
