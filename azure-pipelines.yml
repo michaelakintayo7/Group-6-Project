@@ -1,53 +1,36 @@
-pool:
-  vmImage: 'ubuntu-latest'
+name: Build and Deploy to GitHub Pages
 
-variables:
-  buildConfiguration: 'Release'
-  buildPlatform: 'Any CPU'
+on:
+  push:
+    branches:
+      - development  # or your default branch
+  workflow_dispatch:
 
-stages:
-- stage: Build
-  displayName: 'Build Stage'
-  jobs:
-  - job: BuildJob
-    displayName: 'Build Job'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
     steps:
-    - script: |
-        sudo apt-get update
-        sudo apt-get install -y php-cli
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php composer-setup.php
-        php -r "unlink('composer-setup.php');"
-        php composer.phar install
-      displayName: 'Install PHP and Composer dependencies'
-      
-    # Ensure that build artifacts are properly archived
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-        replaceExistingArchive: true
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-    # Publish artifacts to be used in the release stage
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4  # or your desired PHP version
 
-- stage: Deploy
-  displayName: 'Deploy Stage'
-  dependsOn: Build
-  jobs:
-  - job: DeployJob
-    displayName: 'Deploy Job'
-    steps:
-    - task: AzureWebApp@1
-      inputs:
-        azureSubscription: 'azure-sub' # Replace with your updated service connection name
-        appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
-        appName: 'group-six-webapp-service' # Your App Service name
-        package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-        deploymentMethod: 'runFromPackage'
+    - name: Install Dependencies
+      run: |
+        composer install
+
+    - name: Run Build Script
+      run: |
+        # Add any custom build steps if needed
+        echo "Build complete"
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public  # Directory where the built site is stored, modify as needed
+        publish_branch: gh-pages
