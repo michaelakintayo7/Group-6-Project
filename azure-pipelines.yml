@@ -1,36 +1,65 @@
-name: Build and Deploy to GitHub Pages
+pool:
+  vmImage: 'ubuntu-latest'
 
-on:
-  push:
-    branches:
-      - main  # or your default branch
-  workflow_dispatch:
+variables:
+  buildConfiguration: 'Release'
+  buildPlatform: 'Any CPU'
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
+stages:
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build Job'
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+    - script: |
+        sudo apt-get update
+        sudo apt-get install -y php-cli
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php composer-setup.php
+        php -r "unlink('composer-setup.php');"
+        php composer.phar install
+      displayName: 'Install PHP and Composer dependencies'
+      
+    # Ensure that build artifacts are properly archived
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
 
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 7.4  # or your desired PHP version
+    # Publish artifacts to be used in the release stage
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
 
-    - name: Install Dependencies
-      run: |
-        composer install
-
-    - name: Run Build Script
-      run: |
-        # Add any custom build steps if needed
-        echo "Build complete"
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public  # Directory where the built site is stored, modify as needed
-        publish_branch: gh-pages
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy Job'
+    steps:
+    - script: |
+        sudo apt-get install -y git
+        git config --global user.name "michaelakintayo7"
+        git config --global user.email "michaelakintayo7@gmail.com"
+        
+        # Clone the repository's gh-pages branch
+        git clone --branch gh-pages https://github.com/michaelakintayo7/main.git gh-pages
+        
+        # Copy the build artifacts to the gh-pages branch
+        cp -r $(Build.ArtifactStagingDirectory)/* gh-pages/
+        
+        # Push changes to the gh-pages branch
+        cd gh-pages
+        git add --all
+        git commit -m "Deploy from Azure Pipelines"
+        git push origin gh-pages
+      displayName: 'Deploy to GitHub Pages'
+      env:
+        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Set up a GitHub token as a pipeline secret
