@@ -4,7 +4,6 @@ pool:
 variables:
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
-  GITHUB_TOKEN: $(GITHUB_TOKEN)  # Use the secret GITHUB_TOKEN
 
 stages:
 - stage: Build
