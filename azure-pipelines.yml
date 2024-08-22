@@ -48,6 +48,6 @@ stages:
       inputs:
         azureSubscription: 'azure-sub' # Replace with your updated service connection name
         appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
-        appName: 'group-six-webapp-services' # Your App Service name
+        appName: 'group-six-webapp-service' # Your App Service name
         package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         deploymentMethod: 'runFromPackage'
