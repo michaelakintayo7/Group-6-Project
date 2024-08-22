@@ -62,4 +62,4 @@ stages:
         git push origin gh-pages
       displayName: 'Deploy to GitHub Pages'
       env:
-        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Set up a GitHub token as a pipeline secret
+        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Reference the GitHub token set as a secret in Azure Pipelines
