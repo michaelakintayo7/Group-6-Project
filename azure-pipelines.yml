@@ -46,7 +46,7 @@ stages:
     steps:
     - task: AzureWebApp@1
       inputs:
-        azureSubscription: 'azure-sub' # Replace with your updated service connection name
+        azureSubscription: 'sc://<akin0063>/<Flinders-DevOps-Group-6>/<azure-sub>' # Replace with your updated service connection name
         appType: 'webApp' # Use 'webApp' if it's a Windows App Service, 'webAppLinux' for Linux
         appName: 'group-six-webapp-service' # Your App Service name
         package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
