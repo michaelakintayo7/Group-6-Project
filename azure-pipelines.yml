@@ -4,6 +4,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
+  GITHUB_TOKEN: $(GITHUB_TOKEN)  # Use the secret GITHUB_TOKEN
 
 stages:
 - stage: Build
@@ -50,7 +51,7 @@ stages:
         git config --global user.email "michaelakintayo7@gmail.com"
         
         # Clone the repository's gh-pages branch
-        git clone --branch gh-pages https://github.com/michaelakintayo7/main.git gh-pages
+        git clone --branch gh-pages https://$(GITHUB_TOKEN):x-oauth-basic@github.com/michaelakintayo7/Group-6-Project.git gh-pages
         
         # Copy the build artifacts to the gh-pages branch
         cp -r $(Build.ArtifactStagingDirectory)/* gh-pages/
