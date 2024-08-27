@@ -8,15 +8,15 @@ variables:
 stages:
 - stage: Build
   displayName: 'Build Stage'
-  condition: eq(variables['Build.SourceBranchName'], 'development')
   jobs:
   - job: BuildJob
     displayName: 'Build Job'
     steps:
     - script: |
         sudo apt-get update
-      displayName: 'Update Ubuntu'
+      displayName: 'Update system packages'
 
+    # Ensure that build artifacts are properly archived
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)'
@@ -25,42 +25,55 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
+    # Publish artifacts to be used in the release stage
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
+- stage: PushToMain
+  displayName: 'Push artifacts to the main branch'
+  jobs:
+  - job: PushJob
+    displayName: 'Push Job'
+    steps:
     - script: |
         sudo apt-get install -y git
         git config --global user.name "michaelakintayo7"
         git config --global user.email "michaelakintayo7@gmail.com"
         
-        # Push the build artifacts to the main branch
+        # Clone the repository's main branch
+        git clone https://$(GITHUB_TOKEN):x-oauth-basic@github.com/michaelakintayo7/Group-6-Project.git
+        cd Group-6-Project
+
+        # Check out the main branch and pull the latest changes
         git checkout main
         git pull origin main
-        git add -A
-        git commit -m "Auto-commit from CI pipeline on $(Build.BuildId)"
+        
+        # Copy the build artifacts to the main branch
+        cp -r $(Build.ArtifactStagingDirectory)/* .
+
+        # Commit and push changes to the main branch
+        git add --all
+        git commit -m "Push artifacts to main branch from Azure Pipelines"
         git push origin main
-      displayName: 'Push artifacts to the main branch'
+      displayName: 'Push to Main Branch'
+      env:
+        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Reference the GitHub token set as a secret in Azure Pipelines
 
 - stage: Deploy
   displayName: 'Deploy Stage'
-  dependsOn: Build
-  condition: eq(variables['Build.SourceBranchName'], 'deployment')
+  dependsOn: PushToMain
   jobs:
   - job: DeployJob
     displayName: 'Deploy Job'
     steps:
     - script: |
-        sudo apt-get install -y lftp
-        
-        # Deploy the artifacts to the Namecheap FTP server
-        lftp -e "
-          set ftp:ssl-allow no;
-          open -u chemManager@igetam.com,ShMoJaKa123 ftp.derightway.com;
-          lcd $(Build.ArtifactStagingDirectory);
-          mirror -R ./ /public_html/;
-          bye
-        "
-      displayName: 'Deploy to Namecheap FTP Server'
+        # Connect to FTP server and upload artifacts
+        lftp -u $(FTP_USERNAME),$(FTP_PASSWORD) -e "set ftp:ssl-allow no; mirror -R ./ /; quit" $(FTP_SERVER)
+      displayName: 'Deploy to Namecheap Server'
+      env:
+        FTP_USERNAME: 'chemManager@igetam.com'
+        FTP_PASSWORD: 'ShMoJaKa123'
+        FTP_SERVER: 'ftp.derightway.com'
