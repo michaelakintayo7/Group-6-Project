@@ -7,51 +7,51 @@ variables:
   buildPlatform: 'Any CPU'
 
 stages:
-  - stage: Build
-    displayName: 'Build Stage'
-    jobs:
-      - job: BuildJob
-        displayName: 'Build Job'
-        steps:
-          - script: |
-              sudo apt-get update
-              sudo apt-get install -y php-cli
-              php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-              php composer-setup.php
-              php -r "unlink('composer-setup.php');"
-              php composer.phar install
-            displayName: 'Install PHP and Composer dependencies'
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build Job'
+    steps:
+    - script: |
+        sudo apt-get update
+        sudo apt-get install -y php-cli
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php composer-setup.php
+        php -r "unlink('composer-setup.php');"
+        php composer.phar install
+      displayName: 'Install PHP and Composer dependencies'
 
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: '$(Build.SourcesDirectory)'
-              includeRootFolder: false
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-              replaceExistingArchive: true
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
 
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'drop'
-              publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
 
-  - stage: Deploy
-    displayName: 'Deploy Stage'
-    dependsOn: Build
-    jobs:
-      - job: DeployJob
-        displayName: 'Deploy Job'
-        steps:
-          - script: |
-              sudo apt-get install -y lftp
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy Job'
+    steps:
+    - script: |
+        sudo apt-get install -y lftp
 
-              # Deploy the artifacts to the Namecheap FTP server
-              lftp -e "
-                set ftp:ssl-allow no;
-                open -u $(ftpUsername),$(ftpPassword) $(ftpServer);
-                lcd $(Build.ArtifactStagingDirectory);
-                mirror -R ./ /public_html/;
-                bye
-              "
-            displayName: 'Deploy to Namecheap FTP Server'
+        # Deploy the artifacts to the Namecheap FTP server
+        lftp -e "
+          set ftp:ssl-allow no;
+          open -u $(ftpUsername),$(ftpPassword) $(ftpServer);
+          lcd $(Build.ArtifactStagingDirectory);
+          mirror -R ./ /public_html/;
+          bye
+        "
+      displayName: 'Deploy to Namecheap FTP Server'
