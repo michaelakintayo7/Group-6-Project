@@ -2,7 +2,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: 'Namecheap FTP Credentials'  # Reference the variable group for FTP credentials
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
 
@@ -21,7 +20,7 @@ stages:
         php -r "unlink('composer-setup.php');"
         php composer.phar install
       displayName: 'Install PHP and Composer dependencies'
-
+      
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)'
@@ -45,11 +44,11 @@ stages:
     steps:
     - script: |
         sudo apt-get install -y lftp
-
+        
         # Deploy the artifacts to the Namecheap FTP server
         lftp -e "
           set ftp:ssl-allow no;
-          open -u $(ftpUsername),$(ftpPassword) $(ftpServer);
+          open -u chemManager@igetam.com,ShMoJaKa123 ftp.derightway.com;
           lcd $(Build.ArtifactStagingDirectory);
           mirror -R ./ /public_html/;
           bye
