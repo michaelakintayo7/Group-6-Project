@@ -8,19 +8,15 @@ variables:
 stages:
 - stage: Build
   displayName: 'Build Stage'
+  condition: eq(variables['Build.SourceBranchName'], 'development')
   jobs:
   - job: BuildJob
     displayName: 'Build Job'
     steps:
     - script: |
         sudo apt-get update
-        sudo apt-get install -y php-cli
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php composer-setup.php
-        php -r "unlink('composer-setup.php');"
-        php composer.phar install
-      displayName: 'Install PHP and Composer dependencies'
-      
+      displayName: 'Update Ubuntu'
+
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)'
@@ -35,9 +31,23 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
+    - script: |
+        sudo apt-get install -y git
+        git config --global user.name "michaelakintayo7"
+        git config --global user.email "michaelakintayo7@gmail.com"
+        
+        # Push the build artifacts to the main branch
+        git checkout main
+        git pull origin main
+        git add -A
+        git commit -m "Auto-commit from CI pipeline on $(Build.BuildId)"
+        git push origin main
+      displayName: 'Push artifacts to the main branch'
+
 - stage: Deploy
   displayName: 'Deploy Stage'
   dependsOn: Build
+  condition: eq(variables['Build.SourceBranchName'], 'deployment')
   jobs:
   - job: DeployJob
     displayName: 'Deploy Job'
