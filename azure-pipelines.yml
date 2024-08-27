@@ -2,6 +2,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  - group: 'Namecheap FTP Credentials'  # Reference the variable group for FTP credentials
   buildConfiguration: 'Release'
   buildPlatform: 'Any CPU'
 
@@ -45,21 +46,14 @@ stages:
     displayName: 'Deploy Job'
     steps:
     - script: |
-        sudo apt-get install -y git
-        git config --global user.name "michaelakintayo7"
-        git config --global user.email "michaelakintayo7@gmail.com"
-        
-        # Clone the repository's gh-pages branch
-        git clone --branch gh-pages https://$(GITHUB_TOKEN):x-oauth-basic@github.com/michaelakintayo7/Group-6-Project.git gh-pages
-        
-        # Copy the build artifacts to the gh-pages branch
-        cp -r $(Build.ArtifactStagingDirectory)/* gh-pages/
-        
-        # Push changes to the gh-pages branch
-        cd gh-pages
-        git add --all
-        git commit -m "Deploy from Azure Pipelines"
-        git push origin gh-pages
-      displayName: 'Deploy to GitHub Pages'
-      env:
-        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Reference the GitHub token set as a secret in Azure Pipelines
+        sudo apt-get install -y lftp
+
+        # Deploy the artifacts to the Namecheap FTP server
+        lftp -e "
+          set ftp:ssl-allow no;
+          open -u $(ftpUsername),$(ftpPassword) $(ftpServer);
+          lcd $(Build.ArtifactStagingDirectory);
+          mirror -R ./ /public_html/;
+          bye
+        "
+      displayName: 'Deploy to Namecheap FTP Server'
