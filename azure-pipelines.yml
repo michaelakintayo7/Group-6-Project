@@ -44,7 +44,7 @@ stages:
         git config --global user.email "michaelakintayo7@gmail.com"
         
         # Clone the repository's main branch
-        git clone https://$(GITHUB_TOKEN):x-oauth-basic@github.com/michaelakintayo7/Group-6-Project.git
+        git clone https://$(GITHUB_TOKEN)@github.com/michaelakintayo7/Group-6-Project.git
         cd Group-6-Project
 
         # Check out the main branch and pull the latest changes
@@ -60,7 +60,7 @@ stages:
         git push origin main
       displayName: 'Push to Main Branch'
       env:
-        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Reference the GitHub token set as a secret in Azure Pipelines
+        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Ensure this is set correctly
 
 - stage: Deploy
   displayName: 'Deploy Stage'
@@ -70,8 +70,11 @@ stages:
     displayName: 'Deploy Job'
     steps:
     - script: |
+        # Install lftp
+        sudo apt-get install -y lftp
+
         # Connect to FTP server and upload artifacts
-        lftp -u $(FTP_USERNAME),$(FTP_PASSWORD) -e "set ftp:ssl-allow no; mirror -R ./ /; quit" $(FTP_SERVER)
+        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "set ftp:ssl-allow no; mirror -R ./ /; quit" $FTP_SERVER
       displayName: 'Deploy to Namecheap Server'
       env:
         FTP_USERNAME: 'chemManager@igetam.com'
