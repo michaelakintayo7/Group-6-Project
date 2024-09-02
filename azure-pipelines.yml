@@ -1,3 +1,13 @@
+trigger:
+  branches:
+    exclude:
+      - development  # Exclude direct commits to the development branch from triggering the pipeline
+
+pr:
+  branches:
+    include:
+      - main  # Trigger the pipeline only on pull requests to the main branch
+
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -25,46 +35,16 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
-    # Publish artifacts to be used in the release stage
+    # Publish artifacts to be used in the deployment stage
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: PushToMain
-  displayName: 'Push artifacts to the main branch'
-  jobs:
-  - job: PushJob
-    displayName: 'Push Job'
-    steps:
-    - script: |
-        sudo apt-get install -y git
-        git config --global user.name "michaelakintayo7"
-        git config --global user.email "michaelakintayo7@gmail.com"
-        
-        # Clone the repository's main branch
-        git clone https://$(GITHUB_TOKEN)@github.com/michaelakintayo7/Group-6-Project.git
-        cd Group-6-Project
-
-        # Check out the main branch and pull the latest changes
-        git checkout main
-        git pull origin main
-        
-        # Copy the build artifacts to the main branch
-        cp -r $(Build.ArtifactStagingDirectory)/* .
-
-        # Commit and push changes to the main branch
-        git add --all
-        git commit -m "Push artifacts to main branch from Azure Pipelines"
-        git push origin main
-      displayName: 'Push to Main Branch'
-      env:
-        GITHUB_TOKEN: $(GITHUB_TOKEN)  # Ensure this is set correctly
-
 - stage: Deploy
   displayName: 'Deploy Stage'
-  dependsOn: PushToMain
+  dependsOn: Build
   jobs:
   - job: DeployJob
     displayName: 'Deploy Job'
