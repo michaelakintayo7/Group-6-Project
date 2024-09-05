@@ -18,7 +18,14 @@ if (!isset($_SESSION['username'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style1.css">
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        .button-group {
+            display: flex;
+            gap: 10px;
+            /* Adjust spacing as needed */
+        }
+    </style>
 </head>
 
 <body>
@@ -56,8 +63,8 @@ if (!isset($_SESSION['username'])) {
                 }
 
             ?>
-
-                <header>Change Profile</header>
+                <br>
+                <h3>Change Password</h3>
                 <form action="#" method="POST" enctype="multipart/form-data">
 
                     <div class="form-box">
@@ -81,17 +88,21 @@ if (!isset($_SESSION['username'])) {
                             <i class="fa fa-eye toggle icon"></i>
                         </div>
 
-                    </div>
+                        <br>
 
 
-                    <div class="field">
-                        <input type="submit" name="update" id="submit" value="Update" class="btn">
+                        <div class="button-group">
+                            <button class="btn btn-secondary" onclick="goBack()" style="width: 180px;">Back</button>
+                            <input type="submit" name="update" id="submit" value="Update" class="btn" style="width: 180px;">
+                        </div>
+
                     </div>
 
 
                 </form>
+
+            <?php } ?>
         </div>
-    <?php } ?>
     </div>
 
     <script>
@@ -104,7 +115,11 @@ if (!isset($_SESSION['username'])) {
             } else {
                 input.type = "password";
             }
-        })
+        });
+
+        function goBack() {
+            window.history.back();
+        }
     </script>
 
 </body>
