@@ -92,7 +92,7 @@ if (!isset($_SESSION['username'])) {
 
 
                         <div class="button-group">
-                            <button class="btn btn-secondary" onclick="goBack()" style="width: 180px;">Back</button>
+                            <button type="button" class="btn btn-secondary" onclick="goBack()" style="width: 180px;">Cancle</button>
                             <input type="submit" name="update" id="submit" value="Update" class="btn" style="width: 180px;">
                         </div>
 
