@@ -1,12 +1,7 @@
 trigger:
   branches:
-    exclude:
-      - development  # Exclude direct commits to the development branch from triggering the pipeline
-
-pr:
-  branches:
     include:
-      - main  # Trigger the pipeline only on pull requests to the main branch
+      - development  # Automatically trigger the pipeline on commits to the development branch
 
 pool:
   vmImage: 'ubuntu-latest'
