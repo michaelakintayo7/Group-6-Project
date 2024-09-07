@@ -48,8 +48,12 @@ stages:
         # Install lftp
         sudo apt-get install -y lftp
 
-        # Connect to FTP server and upload artifacts
-        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "set ftp:ssl-allow no; mirror -R ./ /; quit" $FTP_SERVER
+        # Connect to FTP server, delete existing content, and upload new artifacts
+        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "
+          set ftp:ssl-allow no;
+          mirror --delete --reverse ./ /;
+          quit
+        " $FTP_SERVER
       displayName: 'Deploy to Namecheap Server'
       env:
         FTP_USERNAME: 'chemManager@igetam.com'
