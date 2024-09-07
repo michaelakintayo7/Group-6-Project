@@ -48,12 +48,17 @@ stages:
         # Install lftp
         sudo apt-get install -y lftp
 
+        # Debugging: Print FTP credentials and server details
+        echo "FTP_SERVER: $FTP_SERVER"
+        echo "FTP_USERNAME: $FTP_USERNAME"
+
         # Connect to FTP server, delete existing content, and upload new artifacts
         lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "
           set ftp:ssl-allow no;
+          open $FTP_SERVER;
           mirror --delete --reverse ./ /;
           quit
-        " $FTP_SERVER
+        " || { echo 'Failed to connect or perform FTP operations'; exit 1; }
       displayName: 'Deploy to Namecheap Server'
       env:
         FTP_USERNAME: 'chemManager@igetam.com'
