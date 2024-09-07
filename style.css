@@ -1,0 +1,336 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+/* navbar section  */
+
+.navbar {
+    padding: 20px;
+    background: #232D4B;
+}
+
+.navbar .navbar-toggler {
+    color: #fff !important;
+    background: #fff;
+    border-radius: 50%;
+    padding: 15px;
+    outline: none;
+    border: none;
+}
+
+.navbar #navbarNav {
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.navbar .navbar-brand {
+    color: #f1f1f1;
+    font-size: 30px;
+    margin-left: 0px;
+    font-weight: 600;
+}
+
+.navbar .navbar-brand i {
+    font-size: 25px;
+    background: #232D4B;
+    border-radius: 50%;
+    padding: 10px 15px;
+}
+
+.navbar .collapse {
+    background: #232D4B;
+}
+
+.navbar .dropdown-menu {
+    width: 12px;
+}
+
+.navbar .dropdown-menu li a {
+    color: #FFD300;
+    font-size: 15px;
+}
+
+.navbar ul li .bi {
+    background: #fff;
+    color: #FFD300;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 50%;
+}
+
+.navbar ul li a {
+    color: #f1f1f1;
+    text-decoration: none;
+    text-transform: capitalize;
+    font-size: 18px;
+    margin-right: 40px;
+}
+
+.navbar ul li a:hover {
+    color: #FFD300;
+}
+
+.name {
+    font-size: 30px;
+    background-color: #FFD300;
+    color: #333;
+    padding: 50px;
+}
+
+
+
+/* project section  */
+
+.project-section {
+    background-color: #ffffff;
+    padding: 90px;
+    /* height: 100vh; */
+}
+
+
+.project-section .text h1 {
+    font-size: 50px;
+    font-weight: bold;
+    color: #232D4B;
+    text-transform: capitalize;
+}
+
+.project-section .text p {
+    font-size: 18px;
+    color: #232D4B;
+}
+
+.project-section .project .card {
+    height: 400px;
+    margin-top: 40px;
+    border: none;
+    margin-left: 30px;
+    box-shadow: 8px 8px 10px 232D4B(0, 0, 0, 0.3);
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #FFD300;
+
+}
+
+.project-section .project .card:hover {
+    transform: scale(1.2);
+}
+
+.project-section .project .card h4 {
+    font-size: 20px;
+    color: #232D4B;
+    font-weight: bold;
+    margin-top: 20px;
+
+}
+
+.project-section .project .card p {
+    font-size: 15px;
+    color: #232D4B;
+    margin-left: 0;
+    margin-top: 10px;
+}
+
+.project-section .project .card button {
+    margin-top: 10px;
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    background-color: #232D4B;
+    height: 40px;
+    width: 120px;
+    text-transform: capitalize;
+}
+
+
+
+/* contact section  */
+
+.contact-section {
+    background: #fbfbfb;
+    padding: 100px;
+}
+
+.contact-section h1 {
+    margin-top: 50px;
+    text-align: center;
+    text-transform: capitalize;
+    font-size: 50px;
+    font-weight: bold;
+    color: #232D4B;
+    margin-bottom: 100px;
+}
+
+.contact-section .info-box {
+    background-color: transparent;
+    border: none;
+    height: 200px;
+    width: 230px;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.contact-section .info-box .bi {
+    background: #232D4B;
+    border-radius: 55%;
+    padding: 15px 18px;
+    color: #fff;
+    font-size: 25px;
+    text-align: center;
+}
+
+.contact-section .info-box h3 {
+    font-size: 25px;
+    margin-top: 30px;
+    font-weight: 600;
+}
+
+.contact-section .info-box p {
+    font-size: 15px;
+    color: #777;
+}
+
+/* .contact-section .info-box:hover {
+    background: #FFD300;
+    color: #fff;
+    transform: scale(0.9);
+} */
+
+/* .contact-section .info-box:hover p {
+    color: #f1f1f1;
+} */
+
+/* .contact-section .info-box:hover .bi {
+    background: #fff;
+    color: #232D4B;
+    font-size: 25px;
+    text-align: center;
+} */
+
+.contact-section .form {
+    margin-top: 50px;
+}
+
+.contact-section form input,
+.contact-section form textarea {
+    margin-top: 10px;
+    border: none;
+    background: #f1f1f1;
+    color: #1c456d;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.contact-section form button {
+    margin-top: 20px;
+    border-radius: 5px;
+    color: #fff;
+    border: none;
+    background-color: #232D4B;
+    height: 50px;
+    width: 170px;
+    text-transform: capitalize;
+}
+
+.contact-section form button:hover {
+    background-color: rgba(35, 45, 75, 0.9);
+    /* border: 2px solid #232D4B; */
+    color: #232D4B;
+}
+
+
+/* footer section  */
+
+footer {
+    padding: 40px;
+    background: #232D4B;
+}
+
+/* footer .logo {
+    font-size: 30px;
+    color: #fff;
+    font-weight: 600;
+}
+
+footer .logo i {
+    font-size: 25px;
+    background: #FFD300;
+    border-radius: 50%;
+    padding: 10px 15px;
+}
+
+footer ul li {
+    list-style: none;
+    margin-top: 20px;
+}
+
+footer ul li a {
+    text-decoration: none;
+    color: #d1d1d1;
+    margin-left: 30px;
+    font-size: 15px;
+    text-transform: capitalize;
+    font-weight: 500;
+}
+
+footer ul li a:hover {
+    color: #FFD300;
+} */
+
+footer p {
+    color: #fff;
+    margin-top: 20px;
+    font-size: 15px;
+    margin-left: 30px;
+}
+
+.back-to-top {
+    background: #FFD300;
+    height: 50px;
+    width: 50px;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 50px;
+}
+
+@media (max-width:700px) {
+
+    .hero-section img {
+        height: 350px;
+        margin-top: 50px;
+    }
+
+    .services-section .services .card {
+        margin-bottom: 50px;
+    }
+
+    .services-section .services .row1 {
+        margin-bottom: 0px;
+    }
+
+    .about-section {
+        padding: 50px 30px;
+    }
+
+    .about-section img {
+        height: 300px;
+    }
+
+    .contact-section {
+        padding: 50px;
+    }
+
+    footer ul li a {
+        margin-left: 5px;
+        letter-spacing: 0;
+    }
+}

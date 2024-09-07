@@ -1,0 +1,57 @@
+trigger:
+  branches:
+    include:
+      - development  # Automatically trigger the pipeline on commits to the development branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  buildPlatform: 'Any CPU'
+
+stages:
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build Job'
+    steps:
+    - script: |
+        sudo apt-get update
+      displayName: 'Update system packages'
+
+    # Ensure that build artifacts are properly archived
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
+
+    # Publish artifacts to be used in the deployment stage
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy Job'
+    steps:
+    - script: |
+        # Install lftp
+        sudo apt-get install -y lftp
+
+        # Connect to FTP server and upload artifacts
+        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "set ftp:ssl-allow no; mirror -R ./ /; quit" $FTP_SERVER
+      displayName: 'Deploy to Namecheap Server'
+      env:
+        FTP_USERNAME: 'chemManager@igetam.com'
+        FTP_PASSWORD: 'ShMoJaKa123'
+        FTP_SERVER: 'ftp.derightway.com'
