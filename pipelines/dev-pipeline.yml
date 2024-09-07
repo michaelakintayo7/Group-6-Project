@@ -45,21 +45,18 @@ stages:
     displayName: 'Deploy Job'
     steps:
     - script: |
-        # Install lftp
-        sudo apt-get install -y lftp
-
-        # Debugging: Print FTP credentials and server details
-        echo "FTP_SERVER: $FTP_SERVER"
-        echo "FTP_USERNAME: $FTP_USERNAME"
+        # Install ftp
+        sudo apt-get install -y ftp
 
         # Connect to FTP server, delete existing content, and upload new artifacts
-        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "
-          set ftp:ssl-allow no;
-          open $FTP_SERVER;
-          mirror --delete --reverse ./ /;
-          quit
-        " || { echo 'Failed to connect or perform FTP operations'; exit 1; }
-      displayName: 'Deploy to Namecheap Server'
+        ftp -inv $FTP_SERVER <<EOF
+        user $FTP_USERNAME $FTP_PASSWORD
+        cd /path/to/remote/directory
+        mdelete *
+        mput *
+        bye
+        EOF
+      displayName: 'Deploy to FTP Server'
       env:
         FTP_USERNAME: 'chemManager@igetam.com'
         FTP_PASSWORD: 'ShMoJaKa123'
