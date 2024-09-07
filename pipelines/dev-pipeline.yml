@@ -51,8 +51,14 @@ stages:
         # Connect to FTP server, delete existing content, and upload new artifacts
         ftp -inv $FTP_SERVER <<EOF
         user $FTP_USERNAME $FTP_PASSWORD
-        cd /path/to/remote/directory
-        mdelete *
+        cd /home/derikd/igetam.com
+        # Delete the 'chemManager' directory if it exists
+        quote SITE CHMOD 777 chemManager
+        mdelete chemManager/*
+        rmdir chemManager
+        # Recreate the directory for new artifacts
+        mkdir chemManager
+        cd chemManager
         mput *
         bye
         EOF
