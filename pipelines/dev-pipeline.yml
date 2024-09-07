@@ -45,23 +45,25 @@ stages:
     displayName: 'Deploy Job'
     steps:
     - script: |
-        # Install ftp
-        sudo apt-get install -y ftp
+        # Install lftp
+        sudo apt-get install -y lftp
 
         # Connect to FTP server, delete existing content, and upload new artifacts
-        ftp -inv $FTP_SERVER <<EOF
-        user $FTP_USERNAME $FTP_PASSWORD
-        cd /home/derikd/igetam.com
-        # Delete the 'chemManager' directory if it exists
-        quote SITE CHMOD 777 chemManager
-        mdelete chemManager/*
-        rmdir chemManager
-        # Recreate the directory for new artifacts
-        mkdir chemManager
-        cd chemManager
-        mput *
+        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "
+        set ftp:ssl-allow no;
+        open $FTP_SERVER;
+        # Change to the correct directory
+        cd /home/derikd/igetam.com;
+        # Remove the 'chemManager' directory and its contents if it exists
+        rm -rf chemManager;
+        # Create the 'chemManager' directory
+        mkdir chemManager;
+        # Change to the 'chemManager' directory
+        cd chemManager;
+        # Upload new artifacts
+        mirror -R ./ .;
         bye
-        EOF
+        " 
       displayName: 'Deploy to FTP Server'
       env:
         FTP_USERNAME: 'chemManager@igetam.com'
