@@ -48,23 +48,9 @@ stages:
         # Install lftp
         sudo apt-get install -y lftp
 
-        # Connect to FTP server, delete existing content, and upload new artifacts
-        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "
-        set ftp:ssl-allow no;
-        open $FTP_SERVER;
-        # Change to the correct directory
-        cd /home/derikd/igetam.com;
-        # Remove the 'chemManager' directory and its contents if it exists
-        rm -rf chemManager;
-        # Create the 'chemManager' directory
-        mkdir chemManager;
-        # Change to the 'chemManager' directory
-        cd chemManager;
-        # Upload new artifacts
-        mirror -R ./ .;
-        bye
-        " 
-      displayName: 'Deploy to FTP Server'
+        # Connect to FTP server and upload artifacts
+        lftp -u $FTP_USERNAME,$FTP_PASSWORD -e "set ftp:ssl-allow no; mirror -R ./ /; quit" $FTP_SERVER
+      displayName: 'Deploy to Namecheap Server'
       env:
         FTP_USERNAME: 'chemManager@igetam.com'
         FTP_PASSWORD: 'ShMoJaKa123'
